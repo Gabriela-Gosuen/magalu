@@ -1,223 +1,242 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Magalu Conecta 💙</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <style>
-    :root {
-      --azul-magalu: #007bff;
-      --azul-gradiente: linear-gradient(135deg, #007bff, #00c6ff);
-      --fundo: #f4f7fb;
-      --branco: #fff;
-      --sombra: 0 4px 15px rgba(0,0,0,0.1);
-    }
+<title>Magalu Conecta 💙</title>
 
-    body {
-      font-family: Arial, sans-serif;
-      background: var(--fundo);
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
+<style>
+:root {
+  --azul-magalu:#007bff;
+  --azul-gradiente:linear-gradient(135deg,#007bff,#00c6ff);
+  --fundo:#f4f7fb;
+  --branco:#fff;
+  --sombra:0 4px 15px rgba(0,0,0,.1);
+}
 
-    header {
-      width: 100%;
-      background: var(--azul-gradiente);
-      color: white;
-      text-align: center;
-      padding: 25px 10px;
-    }
+body {
+  font-family:Arial, sans-serif;
+  background:var(--fundo);
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
 
-    .upload-card {
-      background: var(--branco);
-      margin-top: 25px;
-      border-radius: 20px;
-      padding: 25px;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: var(--sombra);
-    }
+header {
+  width:100%;
+  background:var(--azul-gradiente);
+  color:#fff;
+  text-align:center;
+  padding:25px 10px;
+}
 
-    input[type="file"] { display: none; }
+.upload-card {
+  background:var(--branco);
+  margin-top:25px;
+  border-radius:20px;
+  padding:25px;
+  width:90%;
+  max-width:400px;
+  text-align:center;
+  box-shadow:var(--sombra);
+}
 
-    .custom-file {
-      background: var(--azul-gradiente);
-      color: white;
-      padding: 12px 25px;
-      border-radius: 10px;
-      cursor: pointer;
-      display: inline-block;
-      margin-bottom: 15px;
-    }
+input[type=file] { display:none; }
 
-    .btn-enviar {
-      background: var(--azul-gradiente);
-      border: none;
-      color: white;
-      padding: 12px 25px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-    }
+.custom-file {
+  background:var(--azul-gradiente);
+  color:#fff;
+  padding:12px 25px;
+  border-radius:10px;
+  cursor:pointer;
+  display:inline-block;
+  margin-bottom:15px;
+}
 
-    .feed {
-      width: 95%;
-      max-width: 600px;
-      margin: 30px 0 60px 0;
-      display: grid;
-      gap: 20px;
-    }
+.btn-enviar {
+  background:var(--azul-gradiente);
+  border:none;
+  color:white;
+  padding:12px 25px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
 
-    .feed-item {
-      background: var(--branco);
-      border-radius: 15px;
-      box-shadow: var(--sombra);
-      padding: 15px;
-      text-align: center;
-    }
+.feed {
+  width:95%;
+  max-width:600px;
+  margin:30px 0 60px;
+  display:grid;
+  gap:20px;
+}
 
-    img, video {
-      width: 100%;
-      border-radius: 10px;
-    }
+.feed-item {
+  background:var(--branco);
+  border-radius:15px;
+  box-shadow:var(--sombra);
+  padding:15px;
+  text-align:center;
+}
 
-    footer {
-      text-align: center;
-      font-size: 13px;
-      color: #555;
-      margin-top: auto;
-      padding: 10px;
-    }
-  </style>
+img,video {
+  width:100%;
+  border-radius:10px;
+}
+
+footer {
+  margin-top:auto;
+  font-size:13px;
+  color:#555;
+  padding:10px;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <h1>💙 Magalu Conecta</h1>
-  <p>Compartilhe fotos e vídeos com a equipe!</p>
+<h1>💙 Magalu Conecta</h1>
+<p>Compartilhe fotos e vídeos com a equipe!</p>
 </header>
 
 <div class="upload-card">
-  <label class="custom-file" for="fileInput">📸 Escolher arquivo</label>
-  <input type="file" id="fileInput" accept="image/,video/">
-  <br>
-  <button class="btn-enviar" onclick="uploadFile()">🚀 Enviar</button>
-  <div id="preview"></div>
+<label class="custom-file" for="fileInput">📸 Escolher arquivo</label>
+<input type="file" id="fileInput" accept="image/,video/">
+<br><br>
+<button class="btn-enviar" onclick="uploadFile()">🚀 Enviar</button>
+<div id="preview"></div>
 </div>
 
 <h2>📲 Feed da equipe</h2>
 <div id="feed" class="feed"></div>
 
-<footer>Desenvolvido com 💙 para o time Magalu</footer>
+<footer>Desenvolvido com 💙</footer>
 
 <!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/dist/umd/supabase.min.js"></script>
 
 <script>
-  const SUPABASE_URL = "https://phpxwixstdhfpdivmfny.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBocHh3aXhzdGRoZnBkaXZtZm55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzExMDcsImV4cCI6MjA3OTE0NzEwN30.32BhawZ43Fke9-f10xRbQ2r9WPc69-Q1-hgKzFkt2M8";
+console.log("JS OK");
 
-  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ===== CONFIGURAÇÃO =====
+const SUPABASE_URL = "https://phpxwixstdhfpdivmfny.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBocHh3aXhzdGRoZnBkaXZtZm55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzExMDcsImV4cCI6MjA3OTE0NzEwN30.32BhawZ43Fke9-f10xRbQ2r9WPc69-Q1-hgKzFkt2M8";
 
-  async function uploadFile() {
-    const fileInput = document.getElementById("fileInput");
-    const preview = document.getElementById("preview");
+// ===== CLIENTE =====
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    if (!fileInput.files.length) {
-      alert("Escolha um arquivo!");
-      return;
-    }
+console.log("Supabase OK");
 
-    const file = fileInput.files[0];
-    const fileName = Date.now() + "_" + file.name;
+// ===== UPLOAD =====
+async function uploadFile() {
+  console.log("Click upload");
 
-    preview.innerHTML = "⏳ Enviando...";
+  const input = document.getElementById("fileInput");
+  const preview = document.getElementById("preview");
 
-    const { error: uploadError } = await client
-      .storage
-      .from("uploads")
-      .upload(fileName, file);
-
-    if (uploadError) {
-      preview.innerHTML = "❌ Erro no upload";
-      return;
-    }
-
-    const { data } = client
-      .storage
-      .from("uploads")
-      .getPublicUrl(fileName);
-
-    const publicUrl = data.publicUrl;
-
-    await client
-      .from("uploads")
-      .insert([{ url: publicUrl, path: fileName, likes: 0 }]);
-
-    preview.innerHTML = "✅ Enviado!";
-    fileInput.value = "";
-
-    loadFeed();
+  if (!input.files.length) {
+    alert("Escolha um arquivo");
+    return;
   }
 
-  async function loadFeed() {
-    const feed = document.getElementById("feed");
-    feed.innerHTML = "Carregando...";
+  const file = input.files[0];
+  const fileName = Date.now() + "_" + file.name;
 
-    const { data } = await client
-      .from("uploads")
-      .select("*")
-      .order("id", { ascending: false });
+  preview.innerHTML = "⏳ Enviando...";
 
-    if (!data || data.length === 0) {
-      feed.innerHTML = "Nenhuma foto ainda.";
-      return;
-    }
+  const { error: uploadError } = await client.storage.from("upload").upload(fileName, file);
 
-    feed.innerHTML = "";
-
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "feed-item";
-
-      const isVideo = item.url.endsWith(".mp4") || item.url.endsWith(".webm");
-
-      div.innerHTML = `
-        ${isVideo ? <video src="${item.url}" controls></video> : <img src="${item.url}">}
-        <p>❤️ ${item.likes}</p>
-        <button onclick="likeItem('${item.id}', ${item.likes})">Curtir</button>
-        <button onclick="deleteItem('${item.id}', '${item.path}')">Excluir</button>
-      `;
-
-      feed.appendChild(div);
-    });
+  if (uploadError) {
+    console.error(uploadError);
+    preview.innerHTML = "❌ Erro no Storage";
+    return;
   }
 
-  async function likeItem(id, currentLikes) {
-    await client
-      .from("uploads")
-      .update({ likes: currentLikes + 1 })
-      .eq("id", id);
+  const { data } = client.storage.from("upload").getPublicUrl(fileName);
 
-    loadFeed();
+  const { error: dbError } = await client.from("upload").insert({
+    url: data.publicUrl,
+    path: fileName,
+    likes: 0
+  });
+
+  if (dbError) {
+    console.error(dbError);
+    preview.innerHTML = "❌ Erro no Banco";
+    return;
   }
 
-  async function deleteItem(id, path) {
-    if (!confirm("Excluir este arquivo?")) return;
+  preview.innerHTML = "✅ Enviado!";
+  input.value = "";
+  loadFeed();
+}
 
-    await client.storage.from("uploads").remove([path]);
-    await client.from("uploads").delete().eq("id", id);
+// ===== FEED =====
+async function loadFeed() {
+  const feed = document.getElementById("feed");
+  feed.innerHTML = "Carregando...";
 
-    loadFeed();
+  const { data, error } = await client.from("upload")
+    .select("*")
+    .order("created_at", { ascending:false });
+
+  if (error) {
+    console.error(error);
+    feed.innerHTML = "Erro no feed";
+    return;
   }
+
+  if (!data.length) {
+    feed.innerHTML = "Nenhuma postagem ainda 😅";
+    return;
+  }
+
+  feed.innerHTML = "";
+
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "feed-item";
+
+    const isVideo = item.url.includes(".mp4") || item.url.includes(".webm");
+
+    div.innerHTML = `
+      ${isVideo ? <video src="${item.url}" controls></video> : <img src="${item.url}">}
+      <p>❤️ ${item.likes}</p>
+      <button onclick="likeItem('${item.id}')">Curtir</button>
+      <button onclick="deleteItem('${item.id}','${item.path}')">Excluir</button>
+    `;
+
+    feed.appendChild(div);
+  });
+}
+
+// ===== LIKE =====
+async function likeItem(id) {
+  await client.rpc("increment_likes", { row_id:id });
+  loadFeed();
+}
+
+// ===== DELETE =====
+async function deleteItem(id, path) {
+  if (!confirm("Excluir arquivo?")) return;
+
+  await client.storage.from("upload").remove([path]);
+  await client.from("upload").delete().eq("id", id);
 
   loadFeed();
+}
+
+// ===== EXPORTAR PARA HTML =====
+window.uploadFile = uploadFile;
+window.likeItem = likeItem;
+window.deleteItem = deleteItem;
+
+// ===== INIT =====
+loadFeed();
 </script>
 
 </body>
