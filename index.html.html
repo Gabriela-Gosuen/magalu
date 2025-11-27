@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Magalu Conecta 💙</title>
+  <style>
+    :root {
+      --azul-magalu: #007bff;
+      --azul-gradiente: linear-gradient(135deg, #007bff, #00c6ff);
+      --fundo: #f4f7fb;
+      --branco: #fff;
+      --sombra: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: var(--fundo);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      background: var(--azul-gradiente);
+      color: white;
+      text-align: center;
+      padding: 25px 10px;
+      box-shadow: var(--sombra);
+    }
+
+    .upload-card {
+      background: var(--branco);
+      margin-top: 25px;
+      border-radius: 20px;
+      padding: 25px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: var(--sombra);
+      text-align: center;
+    }
+
+    input[type="file"] { display: none; }
+
+    .custom-file {
+      background: var(--azul-gradiente);
+      color: white;
+      padding: 12px 25px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
+
+    .btn-enviar {
+      background: var(--azul-gradiente);
+      border: none;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .feed {
+      width: 95%;
+      max-width: 600px;
+      margin: 30px 0 60px 0;
+      display: grid;
+      gap: 20px;
+    }
+
+    .feed-item {
+      background: var(--branco);
+      border-radius: 15px;
+      box-shadow: var(--sombra);
+      padding: 15px;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 13px;
+      color: #555;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💙 Magalu Conecta</h1>
+  <p>Compartilhe fotos e vídeos com a equipe!</p>
+</header>
+
+<div class="upload-card">
+  <label class="custom-file" for="fileInput">📸 Escolher arquivo</label>
+  <input type="file" id="fileInput" accept="image/*,video/*">
+  <br>
+  <button class="btn-enviar" onclick="uploadFile()">🚀 Enviar</button>
+  <div id="preview"></div>
+</div>
+
+<h2 style="margin-top:40px;">📲 Feed da equipe</h2>
+<div id="feed" class="feed"></div>
+
+<footer>Desenvolvido com 💙 para o time Magalu</footer>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://phpxwixstdhfpdivmfny.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBocHh3aXhzdGRoZnBkaXZtZm55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzExMDcsImV4cCI6MjA3OTE0NzEwN30.32BhawZ43Fke9-f10xRbQ2r9WPc69-Q1-hgKzFkt2M8";
+
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function uploadFile() {
+    const fileInput = document.getElementById("fileInput");
+    const preview = document.getElementById("preview");
+
+    if (!fileInput.files.length) {
+      alert("Escolha um arquivo primeiro!");
+      return;
+    }
+
+    const file = fileInput.files[0];
+    const fileName = Date.now() + "_" + file.name;
+
+    preview.innerHTML = "<p>Enviando...</p>";
+
+    // Upload para o Storage
+    const { data: storageData, error: storageError } = await supabase
+      .storage
+      .from("uploads")
+      .upload(fileName, file);
+
+    if (storageError) {
+      preview.innerHTML = "<p style='color:red;'>Erro no upload</p>";
+      return;
+    }
+
+    // Pegar URL pública
+    const { data: publicUrlData } = supabase
+      .storage
+      .from("uploads")
+      .getPublicUrl(fileName);
+
+    const publicUrl = publicUrlData.publicUrl;
+
+    // Salvar no banco
+    await supabase
+      .from("uploads")
+      .insert([
+        { url: publicUrl, path: fileName }
+      ]);
+
+    preview.innerHTML = "<p style='color:green;'>Enviado!</p>";
+    fileInput.value = "";
+
+    loadFeed();
+  }
+
+  async function loadFeed() {
+    const feed = document.getElementById("feed");
+    feed.innerHTML = "<p>Carregando...</p>";
+
+    const { data, error } = await supabase
+      .from("uploads")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!data || data.length === 0) {
+      feed.innerHTML = "<p>Nenhum envio ainda 😅</p>";
+      return;
+    }
+
+    feed.innerHTML = "";
+
+    data.forEach(item => {
+      const el = document.createElement("div");
+      el.className = "feed-item";
+
+      const isVideo = item.url.endsWith(".mp4") || item.url.includes("video");
+
+      el.innerHTML = `
+        ${isVideo ? `<video src="${item.url}" controls></video>` : `<img src="${item.url}">`}
+        <p>❤️ ${item.likes}</p>
+        <button onclick="likeItem('${item.id}')">Curtir</button>
+        <button onclick="deleteItem('${item.id}', '${item.path}')">Excluir</button>
+      `;
+
+      feed.appendChild(el);
+    });
+  }
+
+  async function likeItem(id) {
+    await supabase.rpc("increment_likes", { row_id: id })
+      .catch(() => {});
+
+    loadFeed();
+  }
+
+  async function deleteItem(id, path) {
+    if (!confirm("Excluir arquivo?")) return;
+
+    await supabase.storage.from("uploads").remove([path]);
+    await supabase.from("uploads").delete().eq("id", id);
+
+    loadFeed();
+  }
+
+  loadFeed();
+</script>
+
+</body>
+</html>
