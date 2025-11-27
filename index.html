@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Magalu Conecta 💙</title>
+
   <style>
     :root {
       --azul-magalu: #007bff;
@@ -14,10 +15,9 @@
     }
 
     body {
-      font-family: "Poppins", sans-serif;
+      font-family: Arial, sans-serif;
       background: var(--fundo);
       margin: 0;
-      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -30,7 +30,6 @@
       color: white;
       text-align: center;
       padding: 25px 10px;
-      box-shadow: var(--sombra);
     }
 
     .upload-card {
@@ -40,8 +39,8 @@
       padding: 25px;
       width: 90%;
       max-width: 400px;
-      box-shadow: var(--sombra);
       text-align: center;
+      box-shadow: var(--sombra);
     }
 
     input[type="file"] { display: none; }
@@ -82,15 +81,21 @@
       text-align: center;
     }
 
+    img, video {
+      width: 100%;
+      border-radius: 10px;
+    }
+
     footer {
       text-align: center;
-      padding: 15px;
       font-size: 13px;
       color: #555;
       margin-top: auto;
+      padding: 10px;
     }
   </style>
 </head>
+
 <body>
 
 <header>
@@ -100,13 +105,13 @@
 
 <div class="upload-card">
   <label class="custom-file" for="fileInput">📸 Escolher arquivo</label>
-  <input type="file" id="fileInput" accept="image/*,video/*">
+  <input type="file" id="fileInput" accept="image/,video/">
   <br>
   <button class="btn-enviar" onclick="uploadFile()">🚀 Enviar</button>
   <div id="preview"></div>
 </div>
 
-<h2 style="margin-top:40px;">📲 Feed da equipe</h2>
+<h2>📲 Feed da equipe</h2>
 <div id="feed" class="feed"></div>
 
 <footer>Desenvolvido com 💙 para o time Magalu</footer>
@@ -118,49 +123,44 @@
   const SUPABASE_URL = "https://phpxwixstdhfpdivmfny.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBocHh3aXhzdGRoZnBkaXZtZm55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1NzExMDcsImV4cCI6MjA3OTE0NzEwN30.32BhawZ43Fke9-f10xRbQ2r9WPc69-Q1-hgKzFkt2M8";
 
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   async function uploadFile() {
     const fileInput = document.getElementById("fileInput");
     const preview = document.getElementById("preview");
 
     if (!fileInput.files.length) {
-      alert("Escolha um arquivo primeiro!");
+      alert("Escolha um arquivo!");
       return;
     }
 
     const file = fileInput.files[0];
     const fileName = Date.now() + "_" + file.name;
 
-    preview.innerHTML = "<p>Enviando...</p>";
+    preview.innerHTML = "⏳ Enviando...";
 
-    // Upload para o Storage
-    const { data: storageData, error: storageError } = await supabase
+    const { error: uploadError } = await client
       .storage
       .from("uploads")
       .upload(fileName, file);
 
-    if (storageError) {
-      preview.innerHTML = "<p style='color:red;'>Erro no upload</p>";
+    if (uploadError) {
+      preview.innerHTML = "❌ Erro no upload";
       return;
     }
 
-    // Pegar URL pública
-    const { data: publicUrlData } = supabase
+    const { data } = client
       .storage
       .from("uploads")
       .getPublicUrl(fileName);
 
-    const publicUrl = publicUrlData.publicUrl;
+    const publicUrl = data.publicUrl;
 
-    // Salvar no banco
-    await supabase
+    await client
       .from("uploads")
-      .insert([
-        { url: publicUrl, path: fileName }
-      ]);
+      .insert([{ url: publicUrl, path: fileName, likes: 0 }]);
 
-    preview.innerHTML = "<p style='color:green;'>Enviado!</p>";
+    preview.innerHTML = "✅ Enviado!";
     fileInput.value = "";
 
     loadFeed();
@@ -168,49 +168,51 @@
 
   async function loadFeed() {
     const feed = document.getElementById("feed");
-    feed.innerHTML = "<p>Carregando...</p>";
+    feed.innerHTML = "Carregando...";
 
-    const { data, error } = await supabase
+    const { data } = await client
       .from("uploads")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("id", { ascending: false });
 
     if (!data || data.length === 0) {
-      feed.innerHTML = "<p>Nenhum envio ainda 😅</p>";
+      feed.innerHTML = "Nenhuma foto ainda.";
       return;
     }
 
     feed.innerHTML = "";
 
     data.forEach(item => {
-      const el = document.createElement("div");
-      el.className = "feed-item";
+      const div = document.createElement("div");
+      div.className = "feed-item";
 
-      const isVideo = item.url.endsWith(".mp4") || item.url.includes("video");
+      const isVideo = item.url.endsWith(".mp4") || item.url.endsWith(".webm");
 
-      el.innerHTML = `
-        ${isVideo ? `<video src="${item.url}" controls></video>` : `<img src="${item.url}">`}
+      div.innerHTML = `
+        ${isVideo ? <video src="${item.url}" controls></video> : <img src="${item.url}">}
         <p>❤️ ${item.likes}</p>
-        <button onclick="likeItem('${item.id}')">Curtir</button>
+        <button onclick="likeItem('${item.id}', ${item.likes})">Curtir</button>
         <button onclick="deleteItem('${item.id}', '${item.path}')">Excluir</button>
       `;
 
-      feed.appendChild(el);
+      feed.appendChild(div);
     });
   }
 
-  async function likeItem(id) {
-    await supabase.rpc("increment_likes", { row_id: id })
-      .catch(() => {});
+  async function likeItem(id, currentLikes) {
+    await client
+      .from("uploads")
+      .update({ likes: currentLikes + 1 })
+      .eq("id", id);
 
     loadFeed();
   }
 
   async function deleteItem(id, path) {
-    if (!confirm("Excluir arquivo?")) return;
+    if (!confirm("Excluir este arquivo?")) return;
 
-    await supabase.storage.from("uploads").remove([path]);
-    await supabase.from("uploads").delete().eq("id", id);
+    await client.storage.from("uploads").remove([path]);
+    await client.from("uploads").delete().eq("id", id);
 
     loadFeed();
   }
